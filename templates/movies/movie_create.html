@@ -1,0 +1,32 @@
+{% extends 'shared/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/movie_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">Add New Movie</h1>
+        <form method="post" class="movie-form" novalidate>
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group {% if field.name == 'release_year' or field.name == 'runtime' or field.name == 'genre' or field.name == 'director' %}half-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error-list">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Save Movie</button>
+                <a href="{% url 'movies:list' %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
