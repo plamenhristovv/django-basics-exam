@@ -2,6 +2,9 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.text import slugify
 
+from movies.validators import validate_runtime_positive, validate_release_year
+from common.validators import validate_description_length
+
 
 class Movie(models.Model):
     class Genre(models.TextChoices):
@@ -36,15 +39,32 @@ class Movie(models.Model):
         blank=True)
     description = models.TextField(
         null=True,
-        blank=True)
-    release_date = models.DateField()
+        blank=True,
+        validators=[validate_description_length]
+    )
+    release_date = models.DateField(
+        validators= [
+            validate_release_year
+        ]
+    )
+
     genre = models.CharField(
         max_length=20,
         choices=Genre.choices)
     image_url = models.URLField()
-    slug = models.SlugField(unique=True, editable=False)
-    runtime = models.IntegerField()
-    director = models.ForeignKey('directors.Director', on_delete=models.CASCADE, related_name='movies')
+    slug = models.SlugField(
+        unique=True,
+        editable=False)
+    runtime = models.IntegerField(
+        validators=[
+            validate_runtime_positive
+        ]
+    )
+    director = models.ForeignKey(
+        'directors.Director',
+        on_delete=models.CASCADE,
+        related_name='movies'
+    )
 
 
     def save(self, *args, **kwargs):
